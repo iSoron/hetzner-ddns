@@ -30,22 +30,21 @@ Options:
 
 The instructions below were tested on Ubuntu Linux 20.04 LTS. 
 
-1. Install `python3` and `pip`:
+1. Install Python and pip:
 
 ```
-apt install python3
+sudo apt install python3 python3-pip
 ```
 
 2. Install package dependencies:
 
 ```
-pip install docopt
+sudo pip3 install docopt
 ```
 
 3. Clone the repository somewhere:
 
 ```
-cd /opt
 git clone https://github.com/iSoron/hetzner-ddns.git
 ```
 
@@ -61,8 +60,8 @@ sudo make install
 6. Run script and enable it during boot:
 
 ```
-sudo systemctl start hetzner-ddns
-sudo systemctl enable hetzner-ddns
+sudo make start
+sudo make enable
 ```
 
 ## License
