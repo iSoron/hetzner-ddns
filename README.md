@@ -23,3 +23,7 @@ Options:
   --disable-v4          Do not update IPv4 address
   --disable-v6          Do not update IPv6 address
 ```
+
+## License
+
+MIT
