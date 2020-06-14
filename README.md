@@ -3,6 +3,8 @@
 This script finds this machine's hostname, public IPv4 and IPv6 addresses,
 then updates the corresponding DNS records on Hetzner.
 
+**Note:** *This script is not developed, maintained or supported by Hetzner.*
+
 ## Usage
 
 ```text
@@ -30,28 +32,38 @@ The instructions below were tested on Ubuntu Linux 20.04 LTS.
 
 1. Install `python3` and `pip`:
 
-    apt install python3
+```
+apt install python3
+```
 
 2. Install package dependencies:
 
-    pip install docopt
+```
+pip install docopt
+```
 
 3. Clone the repository somewhere:
 
-    cd /opt
-    git clone https://github.com/iSoron/hetzner-ddns.git
+```
+cd /opt
+git clone https://github.com/iSoron/hetzner-ddns.git
+```
 
 4. Install the script system-wide:
 
-    cd hetzner-ddns
-    sudo make install
+```
+cd hetzner-ddns
+sudo make install
+```
 
 5. Create a configuration file in `/etc/hetzner-ddns.conf` with you API token. See `/etc/hetzner-ddns.conf.example` for an example.
 
 6. Run script and enable it during boot:
 
-    sudo systemctl start hetzner-ddns
-    sudo systemctl enable hetzner-ddns
+```
+sudo systemctl start hetzner-ddns
+sudo systemctl enable hetzner-ddns
+```
 
 ## License
 
