@@ -1,0 +1,11 @@
+[Unit]
+Description=Hetzner Dynamic DNS Updater
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/hetzner-ddns.py
+
+[Install]
+WantedBy=multi-user.target

@@ -24,6 +24,35 @@ Options:
   --disable-v6          Do not update IPv6 address
 ```
 
+## Running during boot
+
+The instructions below were tested on Ubuntu Linux 20.04 LTS. 
+
+1. Install `python3` and `pip`:
+
+  apt install python3
+
+2. Install package dependencies:
+
+  pip install docopt
+
+3. Clone the repository somewhere:
+
+  cd /opt
+  git clone https://github.com/iSoron/hetzner-ddns.git
+
+4. Install the script system-wide:
+
+  cd hetzner-ddns
+  sudo make install
+
+5. Create a configuration file in `/etc/hetzner-ddns.conf` with you API token. See `/etc/hetzner-ddns.conf.example` for an example.
+
+6. Run script and enable it during boot:
+
+  systemctl start hetzner-ddns
+  systemctl enable hetzner-ddns
+
 ## License
 
 MIT
