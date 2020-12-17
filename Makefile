@@ -2,6 +2,7 @@ install:
 	cp hetzner-ddns.py /usr/local/bin
 	cp etc/hetzner-ddns.conf.example /etc
 	cp etc/systemd/hetzner-ddns.service /etc/systemd/system/
+	systemctl daemon-reload
 
 uninstall:
 	rm /usr/local/bin/hetzner-ddns.py

@@ -20,6 +20,7 @@ Options:
   --config=<file>       Read options from configuration file
   --disable-v4          Do not update IPv4 address
   --disable-v6          Do not update IPv6 address
+  --repeat=<s>          Update DNS again every S seconds
 """
 
 from docopt import docopt
@@ -30,6 +31,7 @@ import requests
 import socket
 import sys
 import configparser
+import time
 
 
 args = docopt(__doc__)
@@ -75,6 +77,7 @@ def merge_defaults():
         "--retry-attempts": 12,
         "--retry-delay": 5,
         "--hostname": socket.gethostname(),
+        "--repeat": 3600,
     }
 
     print("Applying default options:")
@@ -171,8 +174,20 @@ def create_record(record):
     response.raise_for_status()
 
 
+def delete_record(rid):
+    response = requests.delete(
+        url=f"https://dns.hetzner.com/api/v1/records/{rid}",
+        headers={
+            "Content-Type": "application/json",
+            "Auth-API-Token": args["--token"],
+        }
+    )
+    response.raise_for_status()
+
+
 def main():
     kinds = []
+    delay = int(args["--repeat"])
 
     if not bool(args["--disable-v4"]):
         kinds += ["A"]
@@ -183,21 +198,29 @@ def main():
     print("Finding DNS zone...")
     zone = find_zone(args["--zone"])
 
-    for kind in kinds:
-        if kind == "A":
-            print("Finding public IPv4 address...")
-            addr = get_addr(args["--v4-api"])
-            print("    %s" % addr)
-        else:
-            print("Finding public IPv6 address...")
-            addr = get_addr(args["--v6-api"])
-            print("    %s" % addr)
+    while True:
+        for kind in kinds:
+            if kind == "A":
+                print("Finding public IPv4 address...")
+                addr = get_addr(args["--v4-api"])
+                print("    %s" % addr)
+            else:
+                print("Finding public IPv6 address...")
+                addr = get_addr(args["--v6-api"])
+                print("    %s" % addr)
 
-        print("Finding existing %s record..." % kind)
-        rec = find_record(zone=zone, kind=kind, name=args["--hostname"])
+            print("Finding existing %s record..." % kind)
+            rec = find_record(zone=zone, kind=kind, name=args["--hostname"])
 
-        if rec is None:
-            print("    not found")
+            if rec is not None:
+                if rec["value"] == addr:
+                    print("Existing record is up-to-date")
+                    continue
+
+                print("Deleting existing %s record..." % kind)
+                delete_record(rec["id"])
+                print("    done")
+
             print("Creating new %s record..." % kind)
             create_record(
                 {
@@ -209,13 +232,8 @@ def main():
                 }
             )
             print("    done")
-        else:
-            print("    found")
-            print("Updating existing %s record..." % kind)
-            rec["value"] = addr
-            rec["ttl"] = args["--ttl"]
-            update_record(rec)
-            print("    done")
 
+        print(f"Sleeping for {delay} seconds...")
+        time.sleep(delay)
 
 main()

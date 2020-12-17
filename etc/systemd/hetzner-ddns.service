@@ -4,8 +4,8 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-Type=oneshot
-ExecStart=/usr/local/bin/hetzner-ddns.py
+Type=simple
+ExecStart=python3 -u /usr/local/bin/hetzner-ddns.py
 
 [Install]
 WantedBy=multi-user.target
