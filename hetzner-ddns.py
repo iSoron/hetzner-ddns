@@ -39,9 +39,9 @@ def merge_config_file():
     global args
     basepath = os.path.dirname(os.path.abspath(__file__))
     candidate_config_files = [
-      args["--config"],
-      os.path.join(basepath, "hetzner-ddns.conf"),
-      "/etc/hetzner-ddns.conf",
+        args["--config"],
+        os.path.join(basepath, "hetzner-ddns.conf"),
+        "/etc/hetzner-ddns.conf",
     ]
 
     for filename in candidate_config_files:
@@ -51,7 +51,7 @@ def merge_config_file():
             print("Reading options from %s" % filename)
             config = configparser.ConfigParser()
             config.read(filename)
-            
+
             section_name = config.sections()[0]
             print("    %-20s %s" % ("--zone", section_name))
             args["--zone"] = section_name
@@ -64,6 +64,7 @@ def merge_config_file():
                     args[key] = value
 
     return args
+
 
 def merge_defaults():
     global args
@@ -96,34 +97,38 @@ if args["--zone"] is None:
 merge_defaults()
 
 
-def get_addr(url,
-             retry=int(args["--retry-attempts"]),
-             delay=int(args["--retry-delay"])):
+def get_addr(
+    url, retry=int(args["--retry-attempts"]), delay=int(args["--retry-delay"])
+):
     exception = None
     for i in range(retry):
         try:
             import urllib
+
             txt = urllib.request.urlopen(url).read()
             return txt.decode("utf-8")
         except Exception as e:
             exception = e
             print("    connection failed, retrying in %d seconds..." % delay)
             sleep(delay)
-    raise(exception)
+    raise (exception)
 
 
 def get_all_records(zone):
-    response = requests.get(url="https://dns.hetzner.com/api/v1/records",
-                            params={"zone_id": zone["id"]},
-                            headers={"Auth-API-Token": args["--token"]})
+    response = requests.get(
+        url="https://dns.hetzner.com/api/v1/records",
+        params={"zone_id": zone["id"]},
+        headers={"Auth-API-Token": args["--token"]},
+    )
     return response.json()["records"]
 
 
 def get_all_zones():
-    response = requests.get(url="https://dns.hetzner.com/api/v1/zones",
-                            headers={"Auth-API-Token": args["--token"]})
+    response = requests.get(
+        url="https://dns.hetzner.com/api/v1/zones",
+        headers={"Auth-API-Token": args["--token"]},
+    )
     return response.json()["zones"]
-
 
 
 def find_record(zone, name, kind="AAAA"):
@@ -139,7 +144,7 @@ def find_zone(name):
     for z in all_zones:
         if z["name"] == name:
             return z
-    raise(Exception("Zone not found: %s" % name))
+    raise (Exception("Zone not found: %s" % name))
 
 
 def update_record(record):
@@ -149,7 +154,7 @@ def update_record(record):
             "Content-Type": "application/json",
             "Auth-API-Token": args["--token"],
         },
-        data=json.dumps(record)
+        data=json.dumps(record),
     )
     response.raise_for_status()
 
@@ -161,7 +166,7 @@ def create_record(record):
             "Content-Type": "application/json",
             "Auth-API-Token": args["--token"],
         },
-        data=json.dumps(record)
+        data=json.dumps(record),
     )
     response.raise_for_status()
 
@@ -189,20 +194,20 @@ def main():
             print("    %s" % addr)
 
         print("Finding existing %s record..." % kind)
-        rec = find_record(zone=zone,
-                          kind=kind,
-                          name=args["--hostname"])
-        
+        rec = find_record(zone=zone, kind=kind, name=args["--hostname"])
+
         if rec is None:
             print("    not found")
             print("Creating new %s record..." % kind)
-            create_record({
-                "value": addr,
-                "type": kind,
-                "name": args["--hostname"],
-                "zone_id": args["--zone"],
-                "ttl": args["--ttl"],
-            })
+            create_record(
+                {
+                    "value": addr,
+                    "type": kind,
+                    "name": args["--hostname"],
+                    "zone_id": args["--zone"],
+                    "ttl": args["--ttl"],
+                }
+            )
             print("    done")
         else:
             print("    found")
