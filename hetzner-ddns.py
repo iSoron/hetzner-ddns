@@ -227,7 +227,7 @@ def main():
                     "value": addr,
                     "type": kind,
                     "name": args["--hostname"],
-                    "zone_id": args["--zone"],
+                    "zone_id": zone["id"],
                     "ttl": args["--ttl"],
                 }
             )
